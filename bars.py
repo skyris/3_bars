@@ -38,6 +38,23 @@ def get_closest_bar(data, latitude, longitude):  # victor klimov: more natural t
                                              (longitude - float(current_bar["Longitude_WGS84"])) ** 2)
 
 
+def get_user_coordinate():
+    while True:
+        try:
+            latitude = float(input("Введите широту: "))
+            longitude = float(input("Введите долготу: "))
+            break
+        except ValueError:
+            print("Please input correct number")
+    return latitude, longitude
+
+
+def show_results(smallest_bar, biggest_bar, closest_bar):
+    print("Самый маленький бар {} расположен по адресу {}.".format(smallest_bar["Name"], smallest_bar["Address"]))
+    print("Самый большой бар {} расположен по адресу {}.".format(biggest_bar["Name"], biggest_bar["Address"]))
+    print("Ближайший бар {} расположен по адресу {}.".format(closest_bar["Name"], closest_bar["Address"]))
+
+
 if __name__ == "__main__":
     if len(argv) != 2:
         print("Ввидите имя загружаемого файла после 'python3 {}'".format(__file__))
@@ -51,14 +68,7 @@ if __name__ == "__main__":
     json_data = load_data(filename)
     smallest_bar = get_smallest_bar(json_data)
     biggest_bar = get_biggest_bar(json_data)
-    print("Самый маленький бар {} расположен по адресу {}.".format(smallest_bar["Name"], smallest_bar["Address"]))
-    print("Самый большой бар {} расположен по адресу {}.".format(biggest_bar["Name"], biggest_bar["Address"]))
-    while True:
-        try:
-            user_latitude = float(input("Введите широту: "))
-            user_longitude = float(input("Введите долготу: "))
-            break
-        except ValueError:
-            print("Please input correct number")
+    user_latitude, user_longitude = get_user_coordinate()
     closest_bar = get_closest_bar(json_data, user_latitude, user_longitude)
-    print("Ближайший бар {} расположен по адресу {}.".format(closest_bar["Name"], closest_bar["Address"]))
+
+    show_results(smallest_bar, biggest_bar, closest_bar)
