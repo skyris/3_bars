@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 import json
 from math import sqrt
 import os
@@ -9,47 +13,52 @@ def load_data(filepath):
     if not os.path.exists(filepath):
         raise FileNotFoundError("No such file: {}".format(filepath))
     if zipfile.is_zipfile(filepath):
-        with zipfile.ZipFile(filepath, "r") as this_zip:
-            with this_zip.open(this_zip.namelist()[0]) as fd:
-                    text = fd.read().decode("cp1251")
-                    return json.loads(text)
+        with zipfile.ZipFile(filepath, "r") as zip_handler:
+            with zip_handler.open(zip_handler.namelist()[0]) as file_handler:
+                    file_text = file_handler.read().decode("cp1251")
+                    return json.loads(file_text)
     elif filepath.endswith(".json"):
-        with open(filepath, "rb") as fd:
-            text = fd.read().decode("cp1251")
-            return json.loads(text)
+        with open(filepath, "rb") as file_handler:
+            file_text = file_handler.read().decode("cp1251")
+            return json.loads(file_text)
     else:
         raise FileNotFoundError("Not a json or zip file")
 
 
 def get_biggest_bar(data):
-    return max(data, key=lambda bar: bar['SeatsCount'])
+    return max(data, key=lambda current_bar: current_bar['SeatsCount'])
 
 
 def get_smallest_bar(data):
-    return min(data, key=lambda bar: bar['SeatsCount'])
+    return min(data, key=lambda current_bar: current_bar['SeatsCount'])
 
 
-def get_closest_bar(data, longitude, latitude):
-    return min(data, key=lambda bar: sqrt((longitude - float(bar["Longitude_WGS84"])) ** 2 +
-                                          (latitude - float(bar["Latitude_WGS84"])) ** 2))
+def get_closest_bar(data, latitude, longitude):  # victor klimov: more natural than longitude. latitude
+    return min(data, key=lambda current_bar: sqrt((latitude - float(current_bar["Latitude_WGS84"])) ** 2) +
+                                             (longitude - float(current_bar["Longitude_WGS84"])) ** 2)
 
 
 if __name__ == "__main__":
     if len(argv) != 2:
-        print("Ввидите имя загружаемого файла после 'python {}'".format(__file__))
+        print("Ввидите имя загружаемого файла после 'python3 {}'".format(__file__))
+        exit()
+    if argv[1] == "--help":
+        print("Скачайте список московских баров в формате json с сайта http://data.mos.ru/opendata/7710881420-bary.")
+        print("Поместите в текущую директорию. Наберите python {} <имя файла> и нажмите enter.".format(__file__))
         exit()
 
-    data = load_data(argv[1])
-    smallest = get_smallest_bar(data)
-    biggest = get_biggest_bar(data)
-    print("Самый маленький бар - {}, расположенный по адресу {}.".format(smallest["Name"], smallest["Address"]))
-    print("Самый большой бар - {}, расположенный по адресу {}.".format(biggest["Name"], biggest["Address"]))
+    filename = argv[1]
+    json_data = load_data(filename)
+    smallest_bar = get_smallest_bar(json_data)
+    biggest_bar = get_biggest_bar(json_data)
+    print("Самый маленький бар {} расположен по адресу {}.".format(smallest_bar["Name"], smallest_bar["Address"]))
+    print("Самый большой бар {} расположен по адресу {}.".format(biggest_bar["Name"], biggest_bar["Address"]))
     while True:
         try:
-            lat = float(input("Введите широту: "))
-            lon = float(input("Введите долготу: "))
+            user_latitude = float(input("Введите широту: "))
+            user_longitude = float(input("Введите долготу: "))
             break
         except ValueError:
             print("Please input correct number")
-    closest = get_closest_bar(data, lat, lon)
-    print("Ближайший бар - {}, расположенный по адресу {}.".format(closest["Name"], closest["Address"]))
+    closest_bar = get_closest_bar(json_data, user_latitude, user_longitude)
+    print("Ближайший бар {} расположен по адресу {}.".format(closest_bar["Name"], closest_bar["Address"]))
