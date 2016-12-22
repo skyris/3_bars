@@ -44,7 +44,7 @@ if __name__ == "__main__":
         exit()
     if argv[1] == "--help":
         print("Скачайте список московских баров в формате json с сайта http://data.mos.ru/opendata/7710881420-bary.")
-        print("Поместите в текущую директорию. Наберите python {} <имя файла> и нажмите enter.".format(__file__))
+        print("Поместите в текущую директорию. Наберите python3 {} <имя файла> и нажмите enter.".format(__file__))
         exit()
 
     filename = argv[1]
