@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-
 import json
 from math import sqrt
 import os
@@ -33,7 +29,7 @@ def get_smallest_bar(data):
     return min(data, key=lambda current_bar: current_bar['SeatsCount'])
 
 
-def get_closest_bar(data, latitude, longitude):  # victor klimov: more natural than longitude. latitude
+def get_closest_bar(data, latitude, longitude):
     return min(data, key=lambda current_bar: sqrt((latitude - float(current_bar["Latitude_WGS84"])) ** 2) +
                                              (longitude - float(current_bar["Longitude_WGS84"])) ** 2)
 
